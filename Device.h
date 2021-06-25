@@ -4,25 +4,28 @@
 
 EXTERN_C_START
 
-typedef struct _DEVICE_CONTEXT
+typedef struct _CAPTURE_DEVICE
 {
     ULONG PrivateDeviceData;  // just a placeholder
 
-} DEVICE_CONTEXT, *PDEVICE_CONTEXT;
+} CAPTURE_DEVICE, *PCAPTURE_DEVICE;
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
+//WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
 
-NTSTATUS tw68xxCreateDevice(
-    _Inout_ PWDFDEVICE_INIT DeviceInit
+NTSTATUS TW68DispatchCreate(
+    IN PKSDEVICE Device
 );
 
-NTSTATUS tw68xxEvtDeviceAdd(
-    _In_    WDFDRIVER       Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
+NTSTATUS TW68DispatchStart(
+    IN PKSDEVICE Device,
+    IN PIRP Irp,
+    IN PCM_RESOURCE_LIST TranslatedResourceList,
+    IN PCM_RESOURCE_LIST UntranslatedResourceList
 );
 
-VOID tw68xxEvtDriverContextCleanup(
-    _In_ WDFOBJECT DriverObject
+void TW68DispatchStop(
+    IN PKSDEVICE Device,
+    IN PIRP Irp
 );
 
 NTSTATUS DriverEntry(

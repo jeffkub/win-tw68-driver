@@ -2,107 +2,97 @@
 #include "device.tmh"
 
 #ifdef ALLOC_PRAGMA
-#pragma alloc_text (PAGE, tw68xxCreateDevice)
-#pragma alloc_text (PAGE, tw68xxEvtDeviceAdd)
-#pragma alloc_text (PAGE, tw68xxEvtDriverContextCleanup)
+#pragma alloc_text (PAGE, TW68DispatchCreate)
+#pragma alloc_text (PAGE, TW68DispatchStart)
+#pragma alloc_text (PAGE, TW68DispatchStop)
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
-NTSTATUS tw68xxCreateDevice(
-    _Inout_ PWDFDEVICE_INIT DeviceInit
+NTSTATUS TW68DispatchCreate(
+    IN PKSDEVICE Device
 )
 {
-    WDF_OBJECT_ATTRIBUTES deviceAttributes;
-    PDEVICE_CONTEXT deviceContext;
-    WDFDEVICE device;
-    NTSTATUS status;
-
-    PAGED_CODE();
-
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
-
-    status = WdfDeviceCreate(&DeviceInit, &deviceAttributes, &device);
-
-    if (NT_SUCCESS(status)) {
-        deviceContext = DeviceGetContext(device);
-
-        deviceContext->PrivateDeviceData = 0;
-
-        status = WdfDeviceCreateDeviceInterface(
-            device,
-            &GUID_DEVINTERFACE_tw68xx,
-            NULL // ReferenceString
-            );
-    }
-
-    return status;
-}
-
-NTSTATUS tw68xxEvtDeviceAdd(
-    _In_    WDFDRIVER       Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-)
-{
-    NTSTATUS status;
-
-    UNREFERENCED_PARAMETER(Driver);
+    NTSTATUS status = 0;
+    PCAPTURE_DEVICE dev;
 
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    status = tw68xxCreateDevice(DeviceInit);
+    dev = ExAllocatePoolZero(NonPagedPoolNx, sizeof(CAPTURE_DEVICE), 'veDC');
+    if (dev == NULL)
+    {
+        status = STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    /* TODO: Add to bag */
+
+    Device->Context = dev;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
 
     return status;
 }
 
-VOID tw68xxEvtDriverContextCleanup(
-    _In_ WDFOBJECT DriverObject
+NTSTATUS TW68DispatchStart(
+    IN PKSDEVICE Device,
+    IN PIRP Irp,
+    IN PCM_RESOURCE_LIST TranslatedResourceList,
+    IN PCM_RESOURCE_LIST UntranslatedResourceList
 )
 {
-    UNREFERENCED_PARAMETER(DriverObject);
-
-    PAGED_CODE();
-
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
+    return 0;
 }
+
+void TW68DispatchStop(
+    IN PKSDEVICE Device,
+    IN PIRP Irp
+)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+}
+
+const KSDEVICE_DISPATCH TW68DeviceDispatch = {
+    TW68DispatchCreate,                     // Pnp Add Device
+    TW68DispatchStart,                      // Pnp Start
+    NULL,                                   // Post-Start
+    NULL,                                   // Pnp Query Stop
+    NULL,                                   // Pnp Cancel Stop
+    TW68DispatchStop,                       // Pnp Stop
+    NULL,                                   // Pnp Query Remove
+    NULL,                                   // Pnp Cancel Remove
+    NULL,                                   // Pnp Remove
+    NULL,                                   // Pnp Query Capabilities
+    NULL,                                   // Pnp Surprise Removal
+    NULL,                                   // Power Query Power
+    NULL,                                   // Power Set Power
+    NULL                                    // Pnp Query Interface
+};
+
+const KSDEVICE_DESCRIPTOR TW68DeviceDescriptor = {
+    &TW68DeviceDispatch,
+    0,
+    NULL
+};
 
 NTSTATUS DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
     _In_ PUNICODE_STRING RegistryPath
 )
 {
-    WDF_DRIVER_CONFIG config;
     NTSTATUS status;
-    WDF_OBJECT_ATTRIBUTES attributes;
 
     WPP_INIT_TRACING(DriverObject, RegistryPath);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.EvtCleanupCallback = tw68xxEvtDriverContextCleanup;
-
-    WDF_DRIVER_CONFIG_INIT(&config,
-        tw68xxEvtDeviceAdd
-    );
-
-    status = WdfDriverCreate(DriverObject,
+    status = KsInitializeDriver(
+        DriverObject,
         RegistryPath,
-        &attributes,
-        &config,
-        WDF_NO_HANDLE
+        &TW68DeviceDescriptor
     );
-
-    if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
-        WPP_CLEANUP(DriverObject);
-        return status;
-    }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
 
