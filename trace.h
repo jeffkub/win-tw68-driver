@@ -6,12 +6,12 @@
 
 #define WPP_CONTROL_GUIDS                                              \
     WPP_DEFINE_CONTROL_GUID(                                           \
-        tw68xxTraceGuid, (e3b775a7,e2a8,4d70,99e5,dacca366ca85), \
-                                                                            \
+        tw68xxTraceGuid, (e3b775a7,e2a8,4d70,99e5,dacca366ca85),       \
+                                                                       \
         WPP_DEFINE_BIT(MYDRIVER_ALL_INFO)                              \
-        WPP_DEFINE_BIT(TRACE_DRIVER)                                   \
-        WPP_DEFINE_BIT(TRACE_DEVICE)                                   \
-        WPP_DEFINE_BIT(TRACE_QUEUE)                                    \
+        WPP_DEFINE_BIT(DBG_INIT)                                       \
+        WPP_DEFINE_BIT(DBG_PNP)                                        \
+        WPP_DEFINE_BIT(DBG_POWER)                                      \
         )                             
 
 #define WPP_FLAG_LEVEL_LOGGER(flag, level)                                  \
