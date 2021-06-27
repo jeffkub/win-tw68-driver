@@ -2,20 +2,18 @@
 
 EXTERN_C_START
 
-typedef struct _CAPTURE_DEVICE
+typedef struct _TW68_DEVICE
 {
     ULONG PrivateDeviceData;  // just a placeholder
 
-} CAPTURE_DEVICE, *PCAPTURE_DEVICE;
-
-//WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
+} TW68_DEVICE, *PTW68_DEVICE;
 
 NTSTATUS TW68DeviceAdd(
     IN PKSDEVICE Device
 );
 
 void TW68DeviceCleanup(
-    IN PCAPTURE_DEVICE CapDev
+    IN PTW68_DEVICE CapDev
 );
 
 NTSTATUS TW68DeviceStart(

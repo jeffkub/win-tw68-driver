@@ -10,8 +10,9 @@
                                                                        \
         WPP_DEFINE_BIT(MYDRIVER_ALL_INFO)                              \
         WPP_DEFINE_BIT(DBG_INIT)                                       \
-        WPP_DEFINE_BIT(DBG_PNP)                                        \
-        WPP_DEFINE_BIT(DBG_POWER)                                      \
+        WPP_DEFINE_BIT(DBG_DEV)                                        \
+        WPP_DEFINE_BIT(DBG_FILTER)                                     \
+        WPP_DEFINE_BIT(DBG_PIN)                                        \
         )                             
 
 #define WPP_FLAG_LEVEL_LOGGER(flag, level)                                  \

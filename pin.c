@@ -9,6 +9,7 @@
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (PAGE, TW68PinCreate)
+#pragma alloc_text (PAGE, TW68PinCleanup)
 #pragma alloc_text (PAGE, TW68PinProcess)
 #pragma alloc_text (PAGE, TW68PinSetFormat)
 #pragma alloc_text (PAGE, TW68SetState)
@@ -20,9 +21,59 @@ NTSTATUS TW68PinCreate(
     IN PIRP Irp
 )
 {
+    NTSTATUS status;
+    PTW68_PIN tw68Pin = NULL;
+
     PAGED_CODE();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC! entry");
+
+    tw68Pin = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_DEVICE), 'niPC');
+    if (tw68Pin == NULL)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+            "ExAllocatePoolZero failed");
+        status = STATUS_INSUFFICIENT_RESOURCES;
+        goto fail;
+    }
+
+    status = KsAddItemToObjectBag(Pin->Bag, tw68Pin, TW68PinCleanup);
+
+    if (!NT_SUCCESS(status))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+            "KsAddItemToObjectBag failed: %!STATUS!", status);
+        goto fail;
+    }
+
+    Pin->Context = tw68Pin;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC! exit");
+
     return STATUS_SUCCESS;
+
+fail:
+    if (tw68Pin)
+        ExFreePool(tw68Pin);
+
+    return status;
+}
+
+void TW68PinCleanup(
+    IN PTW68_PIN TW68Pin
+)
+{
+    PAGED_CODE();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC! entry");
+
+    ExFreePool(TW68Pin);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC! exit");
 }
 
 NTSTATUS TW68PinProcess(

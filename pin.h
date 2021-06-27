@@ -5,9 +5,19 @@ EXTERN_C_START
 #define PIN_COUNT 1
 #define PIN_DATA_RANGE_COUNT 1
 
+typedef struct _TW68_PIN
+{
+    ULONG PrivateDeviceData;  // just a placeholder
+
+} TW68_PIN, *PTW68_PIN;
+
 NTSTATUS TW68PinCreate(
     IN PKSPIN Pin,
     IN PIRP Irp
+);
+
+void TW68PinCleanup(
+    IN PTW68_PIN TW68Pin
 );
 
 NTSTATUS TW68PinProcess(

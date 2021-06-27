@@ -4,6 +4,7 @@
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (PAGE, TW68FilterCreate)
+#pragma alloc_text (PAGE, TW68FilterCleanup)
 #endif
 
 NTSTATUS TW68FilterCreate(
@@ -11,9 +12,59 @@ NTSTATUS TW68FilterCreate(
     IN PIRP Irp
 )
 {
+    NTSTATUS status;
+    PTW68_FILTER tw68Filter = NULL;
+
     PAGED_CODE();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        "%!FUNC! entry");
+
+    tw68Filter = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_DEVICE), 'liFC');
+    if (tw68Filter == NULL)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+            "ExAllocatePoolZero failed");
+        status = STATUS_INSUFFICIENT_RESOURCES;
+        goto fail;
+    }
+
+    status = KsAddItemToObjectBag(Filter->Bag, tw68Filter, TW68FilterCleanup);
+
+    if (!NT_SUCCESS(status))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+            "KsAddItemToObjectBag failed: %!STATUS!", status);
+        goto fail;
+    }
+
+    Filter->Context = tw68Filter;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        "%!FUNC! exit");
+
     return STATUS_SUCCESS;
+
+fail:
+    if (tw68Filter)
+        ExFreePool(tw68Filter);
+
+    return status;
+}
+
+void TW68FilterCleanup(
+    IN PTW68_FILTER TW68Filter
+)
+{
+    PAGED_CODE();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        "%!FUNC! entry");
+
+    ExFreePool(TW68Filter);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        "%!FUNC! exit");
 }
 
 const KSFILTER_DISPATCH TW68FilterDispatch = {
