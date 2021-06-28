@@ -25,7 +25,7 @@ NTSTATUS TW68DeviceAdd(
     tw68Dev = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_DEVICE), 'veDC');
     if (tw68Dev == NULL)
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
+        TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
             "ExAllocatePoolZero failed");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto fail;
@@ -37,7 +37,7 @@ NTSTATUS TW68DeviceAdd(
 
     if (!NT_SUCCESS(status))
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
+        TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
             "KsAddItemToObjectBag failed: %!STATUS!", status);
         goto fail;
     }

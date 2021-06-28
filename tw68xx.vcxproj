@@ -50,7 +50,7 @@
     <ClInclude Include="trace.h" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="tw68xx.inf" />
+    <Inf Include="tw68xx.inx" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0BDE4CD7-8B23-4C22-A10C-ABFCFF775377}</ProjectGuid>

@@ -1,0 +1,89 @@
+[Version]
+signature="$WINDOWS NT$"
+Class=Camera
+ClassGuid={ca3e7ab9-b4c3-4ae6-8251-579ef933890f}
+Provider=%ProviderName%
+Catalogfile=tw68xx.cat
+DriverVer=06/27/2021,1.0.1000.0
+PnpLockdown=1
+
+[SourceDisksNames]
+1000=%cdname%,,,
+
+[SourceDisksFiles]
+tw68xx.sys=1000
+
+[DestinationDirs]
+DefaultDestDir=13
+tw68xx.CopyFiles=13
+
+[tw68xx.CopyFiles]
+tw68xx.sys
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%tw68xx.DeviceDesc%=tw68xx,AVSHWS
+
+[tw68xx]
+Include=ks.inf, KSCAPTUR.inf
+Needs=KS.Registration,KSCAPTUR.Registration.NT
+CopyFiles=tw68xx.CopyFiles
+
+;---------------------------------------------------------------
+;                I n t e r f a c e s
+;---------------------------------------------------------------
+
+[tw68xx.Interfaces]
+AddInterface=%KSCATEGORY_CAPTURE%,"GLOBAL",CaptureInterface.NT,0
+AddInterface=%KSCATEGORY_VIDEO%,"GLOBAL",CaptureInterface.NT,0
+AddInterface=%KSCATEGORY_VIDEO_CAMERA%,"GLOBAL",CaptureInterface.NT,0
+
+[CaptureInterface.NT]
+AddReg=tw68xx.Reader.AddReg
+
+;---------------------------------------------------------------
+;                A d d R e g
+;---------------------------------------------------------------
+
+[tw68xx.Reader.AddReg]
+HKR,,CLSID,,%Proxy.CLSID%
+HKR,,FriendlyName,,%tw68xx.Reader.FriendlyName%
+
+;---------------------------------------------------------------
+;                S e r v i c e s  
+;---------------------------------------------------------------
+
+[tw68xx.Services]
+AddService=tw68xx, 0x00000002, tw68xx.ServiceInstall
+
+[tw68xx.ServiceInstall]
+DisplayName=%tw68xx.DeviceDesc%
+ServiceType=%SERVICE_KERNEL_DRIVER%
+StartType=%SERVICE_DEMAND_START%
+ErrorControl=%SERVICE_ERROR_NORMAL%
+ServiceBinary=%13%\tw68xx.sys
+
+;---------------------------------------------------------------
+;                S t r i n g s
+;---------------------------------------------------------------
+
+[Strings]
+; non-localizable
+Proxy.CLSID="{17CCA71B-ECD7-11D0-B908-00A0C9223196}"
+KSCATEGORY_CAPTURE="{65E8773D-8F56-11D0-A3B9-00A0C9223196}"
+KSCATEGORY_VIDEO="{6994AD05-93EF-11D0-A3CC-00A0C9223196}"
+KSCATEGORY_VIDEO_CAMERA="{E5323777-F976-4f5b-9B55-B94699C46E44}"
+
+SERVICE_KERNEL_DRIVER=1
+SERVICE_DEMAND_START=3
+SERVICE_ERROR_NORMAL=1
+REG_DWORD=0x00010001
+
+;localizable
+ProviderName="TODO-Set-Provider"
+ManufacturerName="TODO-Set-Manufacturer"
+tw68xx.DeviceDesc="TW68xx Video Capture Device"
+tw68xx.Reader.FriendlyName="tw68xx Source"
+cdname="TW68xx Driver Installation Disk"

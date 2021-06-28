@@ -22,7 +22,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="tw68xx.inf">
+    <Inf Include="tw68xx.inx">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>

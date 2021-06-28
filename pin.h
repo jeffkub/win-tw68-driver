@@ -3,7 +3,7 @@
 EXTERN_C_START
 
 #define PIN_COUNT 1
-#define PIN_DATA_RANGE_COUNT 1
+#define PIN_DATA_RANGE_COUNT 2
 
 typedef struct _TW68_PIN
 {

@@ -20,10 +20,10 @@ NTSTATUS TW68FilterCreate(
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
         "%!FUNC! entry");
 
-    tw68Filter = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_DEVICE), 'liFC');
+    tw68Filter = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_FILTER), 'liFC');
     if (tw68Filter == NULL)
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        TraceEvents(TRACE_LEVEL_CRITICAL, DBG_FILTER,
             "ExAllocatePoolZero failed");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto fail;
@@ -33,7 +33,7 @@ NTSTATUS TW68FilterCreate(
 
     if (!NT_SUCCESS(status))
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
+        TraceEvents(TRACE_LEVEL_CRITICAL, DBG_FILTER,
             "KsAddItemToObjectBag failed: %!STATUS!", status);
         goto fail;
     }
