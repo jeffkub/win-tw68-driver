@@ -12,7 +12,7 @@ NTSTATUS TW68DeviceAdd(
     IN PKSDEVICE Device
 );
 
-void TW68DeviceCleanup(
+VOID TW68DeviceCleanup(
     IN PTW68_DEVICE CapDev
 );
 
@@ -23,7 +23,7 @@ NTSTATUS TW68DeviceStart(
     IN PCM_RESOURCE_LIST UntranslatedResourceList
 );
 
-void TW68DeviceStop(
+VOID TW68DeviceStop(
     IN PKSDEVICE Device,
     IN PIRP Irp
 );

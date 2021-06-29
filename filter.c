@@ -18,13 +18,13 @@ NTSTATUS TW68FilterCreate(
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     tw68Filter = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_FILTER), 'liFC');
     if (tw68Filter == NULL)
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_FILTER,
-            "ExAllocatePoolZero failed");
+            "%!FUNC!: ExAllocatePoolZero failed");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto fail;
     }
@@ -34,14 +34,11 @@ NTSTATUS TW68FilterCreate(
     if (!NT_SUCCESS(status))
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_FILTER,
-            "KsAddItemToObjectBag failed: %!STATUS!", status);
+            "%!FUNC!: KsAddItemToObjectBag failed: %!STATUS!", status);
         goto fail;
     }
 
     Filter->Context = tw68Filter;
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
-        "%!FUNC! exit");
 
     return STATUS_SUCCESS;
 
@@ -52,31 +49,28 @@ fail:
     return status;
 }
 
-void TW68FilterCleanup(
+VOID TW68FilterCleanup(
     IN PTW68_FILTER TW68Filter
 )
 {
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     ExFreePool(TW68Filter);
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FILTER,
-        "%!FUNC! exit");
 }
 
-const KSFILTER_DISPATCH TW68FilterDispatch = {
+static const KSFILTER_DISPATCH TW68FilterDispatch = {
     TW68FilterCreate,                       // Filter Create
     NULL,                                   // Filter Close
     NULL,                                   // Filter Process
     NULL                                    // Filter Reset
 };
 
-const GUID g_KSNAME_Filter = { STATIC_KSNAME_Filter };
+static const GUID g_KSNAME_Filter = { STATIC_KSNAME_Filter };
 
-const GUID TW68FilterCategories[FILTER_CATEGORIES_COUNT] = {
+static const GUID TW68FilterCategories[FILTER_CATEGORIES_COUNT] = {
     STATICGUIDOF(KSCATEGORY_VIDEO),
     STATICGUIDOF(KSCATEGORY_CAPTURE),
     STATICGUIDOF(KSCATEGORY_VIDEO_CAMERA)

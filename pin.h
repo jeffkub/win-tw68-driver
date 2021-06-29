@@ -3,7 +3,7 @@
 EXTERN_C_START
 
 #define PIN_COUNT 1
-#define PIN_DATA_RANGE_COUNT 2
+#define PIN_DATA_RANGE_COUNT 1
 
 typedef struct _TW68_PIN
 {
@@ -16,7 +16,7 @@ NTSTATUS TW68PinCreate(
     IN PIRP Irp
 );
 
-void TW68PinCleanup(
+VOID TW68PinCleanup(
     IN PTW68_PIN TW68Pin
 );
 

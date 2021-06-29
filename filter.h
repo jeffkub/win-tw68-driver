@@ -15,7 +15,7 @@ NTSTATUS TW68FilterCreate(
     IN PIRP Irp
 );
 
-void TW68FilterCleanup(
+VOID TW68FilterCleanup(
     IN PTW68_FILTER TW68Filter
 );
 

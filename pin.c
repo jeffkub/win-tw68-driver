@@ -27,13 +27,13 @@ NTSTATUS TW68PinCreate(
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     tw68Pin = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_PIN), 'niPC');
     if (tw68Pin == NULL)
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_PIN,
-            "ExAllocatePoolZero failed");
+            "%!FUNC!: ExAllocatePoolZero failed");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto fail;
     }
@@ -43,14 +43,11 @@ NTSTATUS TW68PinCreate(
     if (!NT_SUCCESS(status))
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_PIN,
-            "KsAddItemToObjectBag failed: %!STATUS!", status);
+            "%!FUNC!: KsAddItemToObjectBag failed: %!STATUS!", status);
         goto fail;
     }
 
     Pin->Context = tw68Pin;
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
-        "%!FUNC! exit");
 
     return STATUS_SUCCESS;
 
@@ -61,19 +58,16 @@ fail:
     return status;
 }
 
-void TW68PinCleanup(
+VOID TW68PinCleanup(
     IN PTW68_PIN TW68Pin
 )
 {
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     ExFreePool(TW68Pin);
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
-        "%!FUNC! exit");
 }
 
 NTSTATUS TW68PinProcess(
@@ -81,6 +75,9 @@ NTSTATUS TW68PinProcess(
 )
 {
     PAGED_CODE();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC!");
 
     return STATUS_SUCCESS;
 }
@@ -95,6 +92,9 @@ NTSTATUS TW68PinSetFormat(
 {
     PAGED_CODE();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC!");
+
     return STATUS_SUCCESS;
 }
 
@@ -105,6 +105,9 @@ NTSTATUS TW68SetState(
 )
 {
     PAGED_CODE();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC!");
 
     return STATUS_SUCCESS;
 }
@@ -122,10 +125,13 @@ NTSTATUS TW68IntersectHandler(
 {
     PAGED_CODE();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PIN,
+        "%!FUNC!");
+
     return STATUS_SUCCESS;
 }
 
-const KSPIN_DISPATCH TW68PinDispatch = {
+static const KSPIN_DISPATCH TW68PinDispatch = {
     TW68PinCreate,                          // Pin Create
     NULL,                                   // Pin Close
     TW68PinProcess,                         // Pin Process
@@ -138,71 +144,7 @@ const KSPIN_DISPATCH TW68PinDispatch = {
     NULL                                    // Allocator Dispatch
 };
 
-const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
-    // KSDATARANGE
-    {
-        sizeof(KS_DATARANGE_VIDEO),                // FormatSize
-        0,                                          // Flags
-        D_X * D_Y * 3,                              // SampleSize
-        0,                                          // Reserved
-
-        STATICGUIDOF(KSDATAFORMAT_TYPE_VIDEO),     // aka. MEDIATYPE_Video
-        0xe436eb7d, 0x524f, 0x11ce, 0x9f, 0x53, 0x00, 0x20,
-            0xaf, 0x0b, 0xa7, 0x70,                 // aka. MEDIASUBTYPE_RGB24,
-        STATICGUIDOF(KSDATAFORMAT_SPECIFIER_VIDEOINFO) // aka. FORMAT_VideoInfo
-    },
-
-    TRUE,               // BOOL,  bFixedSizeSamples (all samples same size?)
-    FALSE,              // BOOL,  bTemporalCompression (all I frames?)
-    0,                  // Reserved (was StreamDescriptionFlags)
-    0,                  // Reserved (was MemoryAllocationFlags   
-    // _KS_VIDEO_STREAM_CONFIG_CAPS  
-    {
-        STATICGUIDOF(KSDATAFORMAT_SPECIFIER_VIDEOINFO), // GUID
-        KS_AnalogVideo_None,                            // AnalogVideoStandard
-        D_X,D_Y,        // InputSize, (the inherent size of the incoming signal
-                        //             with every digitized pixel unique)
-        D_X,D_Y,        // MinCroppingSize, smallest rcSrc cropping rect allowed
-        D_X,D_Y,        // MaxCroppingSize, largest  rcSrc cropping rect allowed
-        8,              // CropGranularityX, granularity of cropping size
-        1,              // CropGranularityY
-        8,              // CropAlignX, alignment of cropping rect 
-        1,              // CropAlignY;
-        D_X, D_Y,       // MinOutputSize, smallest bitmap stream can produce
-        D_X, D_Y,       // MaxOutputSize, largest  bitmap stream can produce
-        8,              // OutputGranularityX, granularity of output bitmap size
-        1,              // OutputGranularityY;
-        0,              // StretchTapsX  (0 no stretch, 1 pix dup, 2 interp...)
-        0,              // StretchTapsY
-        0,              // ShrinkTapsX 
-        0,              // ShrinkTapsY 
-        333667,         // MinFrameInterval, 100 nS units
-        640000000,      // MaxFrameInterval, 100 nS units
-        8 * 3 * 30 * D_X * D_Y,  // MinBitsPerSecond;
-        8 * 3 * 30 * D_X * D_Y   // MaxBitsPerSecond;
-    },
-    // KS_VIDEOINFOHEADER (default format)
-    {
-        0,0,0,0,                            // RECT  rcSource; 
-        0,0,0,0,                            // RECT  rcTarget; 
-        D_X * D_Y * 3 * 8 * 30,             // DWORD dwBitRate;
-        0L,                                 // DWORD dwBitErrorRate; 
-        333667,                             // REFERENCE_TIME  AvgTimePerFrame;   
-        sizeof(KS_BITMAPINFOHEADER),       // DWORD biSize;
-        D_X,                                // LONG  biWidth;
-        D_Y,                                // LONG  biHeight;
-        1,                                  // WORD  biPlanes;
-        24,                                 // WORD  biBitCount;
-        KS_BI_RGB,                          // DWORD biCompression;
-        D_X * D_Y * 3,                      // DWORD biSizeImage;
-        0,                                  // LONG  biXPelsPerMeter;
-        0,                                  // LONG  biYPelsPerMeter;
-        0,                                  // DWORD biClrUsed;
-        0                                   // DWORD biClrImportant;
-    }
-};
-
-const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
+static const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
     // KSDATARANGE
     {
         sizeof(KS_DATARANGE_VIDEO),            // FormatSize
@@ -267,14 +209,13 @@ const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
     }
 };
 
-const PKSDATARANGE CapturePinDataRanges[PIN_DATA_RANGE_COUNT] = {
-    (PKSDATARANGE)&FormatYUY2_Capture,
-    (PKSDATARANGE)&FormatRGB24Bpp_Capture
+static const PKSDATARANGE CapturePinDataRanges[PIN_DATA_RANGE_COUNT] = {
+    (PKSDATARANGE)&FormatYUY2_Capture
 };
 
-GUID g_PINNAME_VIDEO_CAPTURE = { STATIC_PINNAME_VIDEO_CAPTURE };
+static GUID g_PINNAME_VIDEO_CAPTURE = { STATIC_PINNAME_VIDEO_CAPTURE };
 
-DECLARE_SIMPLE_FRAMING_EX(
+static DECLARE_SIMPLE_FRAMING_EX(
     CapturePinAllocatorFraming,
     STATICGUIDOF(KSMEMORY_TYPE_KERNEL_NONPAGED),
     KSALLOCATOR_REQUIREMENTF_SYSTEM_MEMORY |

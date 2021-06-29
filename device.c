@@ -20,13 +20,13 @@ NTSTATUS TW68DeviceAdd(
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     tw68Dev = ExAllocatePoolZero(NonPagedPoolNx, sizeof(TW68_DEVICE), 'veDC');
     if (tw68Dev == NULL)
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
-            "ExAllocatePoolZero failed");
+            "%!FUNC!: ExAllocatePoolZero failed");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto fail;
     }
@@ -38,14 +38,11 @@ NTSTATUS TW68DeviceAdd(
     if (!NT_SUCCESS(status))
     {
         TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
-            "KsAddItemToObjectBag failed: %!STATUS!", status);
+            "%!FUNC!: KsAddItemToObjectBag failed: %!STATUS!", status);
         goto fail;
     }
 
     Device->Context = tw68Dev;
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! exit");
 
     return STATUS_SUCCESS;
 
@@ -56,19 +53,16 @@ fail:
     return status;
 }
 
-void TW68DeviceCleanup(
+VOID TW68DeviceCleanup(
     IN PTW68_DEVICE TW68Dev
 )
 {
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     ExFreePool(TW68Dev);
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! exit");
 }
 
 NTSTATUS TW68DeviceStart(
@@ -84,7 +78,7 @@ NTSTATUS TW68DeviceStart(
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! entry");
+        "%!FUNC!");
 
     if (!Device->Started)
     {
@@ -102,11 +96,12 @@ NTSTATUS TW68DeviceStart(
         KsReleaseDevice(Device);
 
         if (!NT_SUCCESS(status))
+        {
+            TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
+                "%!FUNC!: KsCreateFilterFactory failed: %!STATUS!", status);
             goto fail;
+        }
     }
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! exit");
 
     return STATUS_SUCCESS;
 
@@ -114,7 +109,7 @@ fail:
     return status;
 }
 
-void TW68DeviceStop(
+VOID TW68DeviceStop(
     IN PKSDEVICE Device,
     IN PIRP Irp
 )
@@ -122,13 +117,10 @@ void TW68DeviceStop(
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! entry");
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
-        "%!FUNC! exit");
+        "%!FUNC!");
 }
 
-const KSDEVICE_DISPATCH TW68DeviceDispatch = {
+static const KSDEVICE_DISPATCH TW68DeviceDispatch = {
     TW68DeviceAdd,                          // Pnp Add Device
     TW68DeviceStart,                        // Pnp Start
     NULL,                                   // Post-Start
@@ -145,7 +137,7 @@ const KSDEVICE_DISPATCH TW68DeviceDispatch = {
     NULL                                    // Pnp Query Interface
 };
 
-const KSDEVICE_DESCRIPTOR TW68DeviceDescriptor = {
+static const KSDEVICE_DESCRIPTOR TW68DeviceDescriptor = {
     &TW68DeviceDispatch,
     0,
     NULL
@@ -168,6 +160,13 @@ NTSTATUS DriverEntry(
         RegistryPath,
         &TW68DeviceDescriptor
     );
+
+    if (!NT_SUCCESS(status))
+    {
+        TraceEvents(TRACE_LEVEL_CRITICAL, DBG_INIT,
+            "%!FUNC! KsInitializeDriver failed: %!STATUS!", status);
+        WPP_CLEANUP(DriverObject);
+    }
 
     return status;
 }
