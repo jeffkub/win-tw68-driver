@@ -76,7 +76,7 @@ static const GUID TW68FilterCategories[FILTER_CATEGORIES_COUNT] = {
     STATICGUIDOF(KSCATEGORY_VIDEO_CAMERA)
 };
 
-const KSFILTER_DESCRIPTOR TW68FilterDescriptor = {
+static const KSFILTER_DESCRIPTOR TW68FilterDescriptor = {
     &TW68FilterDispatch,                    // Dispatch Table
     NULL,                                   // Automation Table
     KSFILTER_DESCRIPTOR_VERSION,            // Version
@@ -90,4 +90,8 @@ const KSFILTER_DESCRIPTOR TW68FilterDescriptor = {
     0,
     NULL,
     NULL                                    // Component ID
+};
+
+const KSFILTER_DESCRIPTOR * const TW68FilterDescriptorTable[FILTER_COUNT] = {
+    &TW68FilterDescriptor
 };

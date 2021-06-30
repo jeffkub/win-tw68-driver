@@ -73,41 +73,12 @@ NTSTATUS TW68DeviceStart(
     IN PCM_RESOURCE_LIST UntranslatedResourceList
 )
 {
-    NTSTATUS status;
-    PTW68_DEVICE tw68Dev = Device->Context;
-
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
         "%!FUNC!");
 
-    if (!Device->Started)
-    {
-        /* Create the filter device */
-        KsAcquireDevice(Device);
-        status = KsCreateFilterFactory(
-            Device->FunctionalDeviceObject,
-            &TW68FilterDescriptor,
-            L"GLOBAL",
-            NULL,
-            KSCREATE_ITEM_FREEONSTOP,
-            NULL,
-            NULL,
-            NULL);
-        KsReleaseDevice(Device);
-
-        if (!NT_SUCCESS(status))
-        {
-            TraceEvents(TRACE_LEVEL_CRITICAL, DBG_DEV,
-                "%!FUNC!: KsCreateFilterFactory failed: %!STATUS!", status);
-            goto fail;
-        }
-    }
-
     return STATUS_SUCCESS;
-
-fail:
-    return status;
 }
 
 VOID TW68DeviceStop(
@@ -139,9 +110,11 @@ static const KSDEVICE_DISPATCH TW68DeviceDispatch = {
 };
 
 static const KSDEVICE_DESCRIPTOR TW68DeviceDescriptor = {
-    &TW68DeviceDispatch,
-    0,
-    NULL
+    &TW68DeviceDispatch,                    // Dispatch Table
+    FILTER_COUNT,                           // Filter Descriptor Count
+    TW68FilterDescriptorTable,              // Filter Descriptor Table
+    0,                                      // Version
+    0                                       // Flags
 };
 
 NTSTATUS DriverEntry(

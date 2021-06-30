@@ -2,6 +2,7 @@
 
 EXTERN_C_START
 
+#define FILTER_COUNT 1
 #define FILTER_CATEGORIES_COUNT 3
 
 typedef struct _TW68_FILTER
@@ -19,6 +20,6 @@ VOID TW68FilterCleanup(
     IN PTW68_FILTER TW68Filter
 );
 
-extern const KSFILTER_DESCRIPTOR TW68FilterDescriptor;
+extern const KSFILTER_DESCRIPTOR* const TW68FilterDescriptorTable[FILTER_COUNT];
 
 EXTERN_C_END
