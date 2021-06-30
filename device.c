@@ -8,6 +8,7 @@
 #pragma alloc_text (PAGE, TW68DeviceStart)
 #pragma alloc_text (PAGE, TW68DeviceStop)
 #pragma alloc_text (INIT, DriverEntry)
+#pragma alloc_text (PAGE, DriverUnload)
 #endif
 
 NTSTATUS TW68DeviceAdd(
@@ -168,5 +169,15 @@ NTSTATUS DriverEntry(
         WPP_CLEANUP(DriverObject);
     }
 
+    DriverObject->DriverUnload = DriverUnload;
+
     return status;
+}
+
+_Use_decl_annotations_
+VOID DriverUnload(
+    PDRIVER_OBJECT DriverObject
+)
+{
+    WPP_CLEANUP(DriverObject);
 }

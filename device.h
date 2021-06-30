@@ -33,4 +33,6 @@ NTSTATUS DriverEntry(
     _In_ PUNICODE_STRING RegistryPath
 );
 
+DRIVER_UNLOAD DriverUnload;
+
 EXTERN_C_END
