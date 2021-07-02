@@ -73,11 +73,49 @@ NTSTATUS TW68DeviceStart(
     IN PCM_RESOURCE_LIST UntranslatedResourceList
 )
 {
+    PCM_FULL_RESOURCE_DESCRIPTOR list;
+    PCM_PARTIAL_RESOURCE_DESCRIPTOR desc;
+
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
         "%!FUNC!");
+    
+    if (TranslatedResourceList == NULL)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
+            "%!FUNC!: No resources found");
+        return STATUS_DEVICE_CONFIGURATION_ERROR;
+    }
 
+    list = TranslatedResourceList->List;
+    for (unsigned ix = 0; ix < TranslatedResourceList->Count; ix++)
+    {
+        for (unsigned jx = 0; jx < list->PartialResourceList.Count; jx++)
+        {
+            desc = list->PartialResourceList.PartialDescriptors + jx;
+
+            switch (desc->Type)
+            {
+                case CmResourceTypeMemory:
+                    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
+                        "%!FUNC!: CmResourceTypeMemory found");
+                    break;
+
+                case CmResourceTypeInterrupt:
+                    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_DEV,
+                        "%!FUNC!: CmResourceTypeInterrupt found");
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        list = (PCM_FULL_RESOURCE_DESCRIPTOR)(list->PartialResourceList.PartialDescriptors +
+                                              list->PartialResourceList.Count);
+    }
+    
     return STATUS_SUCCESS;
 }
 

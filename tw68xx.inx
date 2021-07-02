@@ -1,7 +1,7 @@
 [Version]
 signature="$WINDOWS NT$"
-Class=Camera
-ClassGuid={ca3e7ab9-b4c3-4ae6-8251-579ef933890f}
+Class=Media
+ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318}
 Provider=%ProviderName%
 Catalogfile=tw68xx.cat
 DriverVer=06/27/2021,1.0.1000.0
@@ -24,7 +24,12 @@ tw68xx.sys
 %ManufacturerName%=Standard,NT$ARCH$
 
 [Standard.NT$ARCH$]
-%tw68xx.DeviceDesc%=tw68xx,AVSHWS
+; DisplayName           Section           DeviceId
+; -----------           -------           --------
+%tw68xx.DeviceDesc%=    tw68xx,           PCI\VEN_1797&DEV_6810
+%tw68xx.DeviceDesc%=    tw68xx,           PCI\VEN_1797&DEV_6811
+%tw68xx.DeviceDesc%=    tw68xx,           PCI\VEN_1797&DEV_6812
+%tw68xx.DeviceDesc%=    tw68xx,           PCI\VEN_1797&DEV_6813
 
 [tw68xx]
 Include=ks.inf, KSCAPTUR.inf
